@@ -1,3 +1,12 @@
 .env
 venv/*
 content/*
+**/.venv/*
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+.DS_Store
+*.egg-info/
+*.streamlit/*

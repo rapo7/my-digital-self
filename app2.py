@@ -105,35 +105,25 @@ if "chroma_client" not in st.session_state:
     embedding_function = SentenceTransformerEmbeddingFunction(
         model_name="all-MiniLM-L6-v2"
     )
-    
-    try:
-        # Try to get existing collection
-        st.session_state.collection = st.session_state.chroma_client.get_collection(
-            name="knowledge_base",
-            embedding_function=embedding_function
-        )
-    except:
-        # Create new collection if it doesn't exist
-        st.session_state.collection = st.session_state.chroma_client.create_collection(
-            name="knowledge_base",
-            embedding_function=embedding_function
-        )
+    st.session_state.collection = st.session_state.chroma_client.create_collection(
+        name="knowledge_base", embedding_function=embedding_function
+    )
 
-        # Load knowledge base
-        try:
-            with open("knowledge_base.jsonl", "r") as f:
-                for idx, line in enumerate(f):
-                    data = json.loads(line)
-                    # Store both question and answer as documents
-                    question = data["messages"][0]["content"]
-                    answer = data["messages"][1]["content"]
-                    st.session_state.collection.add(
-                        documents=[f"Q: {question}\nA: {answer}"],
-                        metadatas=[{"question": question}],
-                        ids=[str(idx)],
-                    )
-        except FileNotFoundError:
-            st.warning("knowledge_base.jsonl not found")
+    # Load knowledge base
+    try:
+        with open("knowledge_base.jsonl", "r") as f:
+            for idx, line in enumerate(f):
+                data = json.loads(line)
+                # Store both question and answer as documents
+                question = data["messages"][0]["content"]
+                answer = data["messages"][1]["content"]
+                st.session_state.collection.add(
+                    documents=[f"Q: {question}\nA: {answer}"],
+                    metadatas=[{"question": question}],
+                    ids=[str(idx)],
+                )
+    except FileNotFoundError:
+        st.warning("knowledge_base.jsonl not found")
 
 # Initialize Together client
 together_client = Together(api_key=st.secrets["TOGETHER_API_KEY"])
